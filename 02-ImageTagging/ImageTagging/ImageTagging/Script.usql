@@ -17,8 +17,8 @@ DECLARE @image_gps_long = 4;
 
   @metadata =
         SELECT FileName, 
-               CustomImageTagger.ImageOps.getImageGPSProperty(ImgData, @image_gps_lat, @image_gps_lat+1) AS image_lat,
-               CustomImageTagger.ImageOps.getImageGPSProperty(ImgData, @image_gps_long, @image_gps_long+1) AS image_long
+               CustomImageTagger.ImageOps.getImageGPSProperty(ImgData, @image_gps_lat, @image_gps_lat-1) AS image_lat,
+               CustomImageTagger.ImageOps.getImageGPSProperty(ImgData, @image_gps_long, @image_gps_long-1) AS image_long
         FROM @imgs;
 
 //OUTPUT @metadata
