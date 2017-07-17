@@ -130,17 +130,56 @@ namespace CustomImageTagger
                     {
                         switch(propItem.Type)
                         {
-                            case 1:
-                                return string.Join(",", propItem.Value.Select(x => x));
+                            case 5:
+                                return string.Join(",", propItem.Value.Select(x => x.ToString()));
+                            //ExifGpsToFloat(propItem)
                             case 2:
                                 return System.Text.Encoding.UTF8.GetString(propItem.Value);
                             default:
-                                return propItem.Value.ToString();
+                                return $"{propItem.Type}: {propItem.Value.ToString()}";
                         }
                     }
                 }
             }
             return null;
+        }
+
+        public static string getImageGPSProperty(byte[] inBytes, int propertyId, int referencePropertyId)
+        {
+            using (StreamImage inImage = byteArrayToImage(inBytes))
+            {
+                var prop = inImage.mImage.PropertyItems.Where(x => x.Id == propertyId).Take(1);
+                var propRef = inImage.mImage.PropertyItems.Where(x => x.Id == referencePropertyId).Take(1);
+                
+                if(!prop.Any() || !propRef.Any())
+                {
+                    // abort
+                    return null;
+                }
+
+                return ExifGpsToFloat(prop.Single(), propRef.Single()).ToString();
+            }
+        }
+
+        private static float ExifGpsToFloat(PropertyItem propItem, PropertyItem propItemRef)
+        {
+            uint degreesNumerator = BitConverter.ToUInt32(propItem.Value, 0);
+            uint degreesDenominator = BitConverter.ToUInt32(propItem.Value, 4);
+            float degrees = degreesNumerator / (float)degreesDenominator;
+
+            uint minutesNumerator = BitConverter.ToUInt32(propItem.Value, 8);
+            uint minutesDenominator = BitConverter.ToUInt32(propItem.Value, 12);
+            float minutes = minutesNumerator / (float)minutesDenominator;
+
+            uint secondsNumerator = BitConverter.ToUInt32(propItem.Value, 16);
+            uint secondsDenominator = BitConverter.ToUInt32(propItem.Value, 20);
+            float seconds = secondsNumerator / (float)secondsDenominator;
+
+            float coorditate = degrees + (minutes / 60f) + (seconds / 3600f);
+            string gpsRef = System.Text.Encoding.ASCII.GetString(new byte[1] { propItemRef.Value[0] }); //N, S, E, or W
+            if (gpsRef == "S" || gpsRef == "W")
+                coorditate = 0 - coorditate;
+            return coorditate;
         }
 
 

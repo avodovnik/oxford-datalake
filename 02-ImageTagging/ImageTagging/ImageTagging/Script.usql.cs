@@ -8,5 +8,5 @@ using System.Text;
 
 namespace ImageTagging
 {
-    
+
 }
