@@ -1,8 +1,10 @@
-REFERENCE ASSEMBLY ImageCommon;
+﻿REFERENCE ASSEMBLY ImageCommon;
 REFERENCE ASSEMBLY FaceSdk;
 REFERENCE ASSEMBLY ImageEmotion;
 REFERENCE ASSEMBLY ImageTagging;
 REFERENCE ASSEMBLY ImageOcr;
+
+REFERENCE ASSEMBLY CustomImageTagger;
 
 @imgs =
     EXTRACT FileName string, ImgData byte[]
@@ -10,15 +12,14 @@ REFERENCE ASSEMBLY ImageOcr;
     USING new Cognition.Vision.ImageExtractor();
 
 // Extract the number of objects on each image and tag them 
-@faces = 
+@results = 
         PROCESS @imgs
-        PRODUCE FileName,
-                NumFaces int,
-                FaceAge string,
-                FaceGender string
+         PRODUCE FileName,
+            NumObjects int,
+            Tags string
         READONLY FileName
-        USING new Cognition.Vision.FaceDetector();
+        USING new CustomImageTagger.ImageTaggerProcessor();
 
-OUTPUT @faces
+OUTPUT @results
 TO "/output/extraction.csv"
 USING Outputters.Csv();
