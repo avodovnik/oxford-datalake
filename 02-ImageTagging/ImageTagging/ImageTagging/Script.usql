@@ -21,10 +21,6 @@ DECLARE @image_gps_long = 4;
                CustomImageTagger.ImageOps.getImageGPSProperty(ImgData, @image_gps_long, @image_gps_long-1) AS image_long
         FROM @imgs;
 
-//OUTPUT @metadata
-//    TO "/output/metadata.csv"
-//    USING Outputters.Csv();
-
 // Extract the number of objects on each image and tag them 
 @results = 
         PROCESS @imgs
@@ -34,11 +30,13 @@ DECLARE @image_gps_long = 4;
         READONLY FileName
         USING new CustomImageTagger.ImageTaggerProcessor();
 
+// Combine the two lists
 @combined = SELECT m.FileName AS FileName, m.image_lat AS ImageLat, m.image_long AS ImageLong,
                    r.NumObjects AS NumObject, r.Tags AS Tags
             FROM @metadata AS m
                 INNER JOIN (SELECT * FROM @results) AS r
-                ON r.FileName == m.FileName;
+                ON r.FileName == m.FileName
+            WHERE ImageTagging.Helper.HasTag("food", r.Tags);
 
 OUTPUT @combined
 TO "/output/combined.csv"

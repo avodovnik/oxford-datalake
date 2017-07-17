@@ -8,5 +8,14 @@ using System.Text;
 
 namespace ImageTagging
 {
+    public class Helper
+    {
+        public static bool HasTag(string tag, string column)
+        {
+            column = column.ToLower();
+            tag = tag.ToLower();
 
+            return column.Contains(tag);
+        }
+    }
 }
