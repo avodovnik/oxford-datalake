@@ -11,9 +11,9 @@ DECLARE @image_gps_long = 4;
 
 @imgs =
     EXTRACT FileName string, ImgData byte[]
-    FROM @"/photos/{FileName:*}.jpg"
+//    FROM @"/camera-roll/{FileName}.JPG"
+    FROM @"/camera-roll-subset/{FileName}.JPG"
     USING new Cognition.Vision.ImageExtractor();
-
 
   @metadata =
         SELECT FileName, 
@@ -21,9 +21,9 @@ DECLARE @image_gps_long = 4;
                CustomImageTagger.ImageOps.getImageProperty(ImgData, @image_gps_long) AS image_long
         FROM @imgs;
 
-OUTPUT @metadata
-    TO "/output/metadata.csv"
-    USING Outputters.Csv();
+//OUTPUT @metadata
+//    TO "/output/metadata.csv"
+//    USING Outputters.Csv();
 
 // Extract the number of objects on each image and tag them 
 @results = 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
+using System.Linq;
 
 namespace CustomImageTagger
 {
@@ -127,7 +128,15 @@ namespace CustomImageTagger
                 {
                     if (propItem.Id == propertyId)
                     {
-                        return (propItem.Type == 2) ? System.Text.Encoding.UTF8.GetString(propItem.Value) : propItem.Value.ToString();
+                        switch(propItem.Type)
+                        {
+                            case 1:
+                                return string.Join(",", propItem.Value.Select(x => x));
+                            case 2:
+                                return System.Text.Encoding.UTF8.GetString(propItem.Value);
+                            default:
+                                return propItem.Value.ToString();
+                        }
                     }
                 }
             }
