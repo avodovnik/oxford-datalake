@@ -31,34 +31,33 @@ namespace CustomImageTagger
 
             var tags = this.tagger.ProduceTags(input.Get<byte[]>(this.imgColName));
 
-            var stringOfTags = string.Join(";", tags.Keys);
+            var stringOfTags = string.Join(";", tags.Select(x => string.Format("{0}:{1}", x.Key, x.Value)));
 
             output.Set<int>(this.numColName, tags.Count);
             output.Set<string>(this.tagColName, stringOfTags);
 
             return output.AsReadOnly();
-
-            //SqlMap<string, float?> sqlMap = new SqlMap<string, float?>(this.tagger.ProduceTags((byte[])input.Get<byte[]>(this.imgColName))
-            //    .Select<KeyValuePair<string, float>, KeyValuePair<string, float?>>((Func<KeyValuePair<string, float>, KeyValuePair<string, float?>>)(kvp => new KeyValuePair<string, float?>(kvp.Key, new float?(kvp.Value)))));
-
-            //output.Set<int>(this.numColName, (M0)sqlMap.get_Count());
-            //output.Set<SqlMap<string, float?>>(this.tagColName, (M0)sqlMap);
-            //return output.AsReadOnly();
-
-            //throw new NotImplementedException();
         }
 
         private class ImageTagsGenerator
         {
             private Recognizer recognizer;
+            private float _threshold;
 
-            public ImageTagsGenerator()
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="threshold">Specifies the threshold of which tags to include. DEfault set to 0.5</param>
+            public ImageTagsGenerator(float threshold = 0.5f)
             {
+
                 string currentDirectory = Directory.GetCurrentDirectory();
                 this.recognizer = new Recognizer();
                 this.recognizer.Initialize(currentDirectory, Environment.ProcessorCount);
                 this.recognizer.AddCategoryInfo(currentDirectory + "\\category_threshold_coco.txt", "");
                 this.recognizer.AddCategoryInfo(currentDirectory + "\\category_threshold_imagenet.txt", "");
+
+                this._threshold = threshold;
             }
 
             public Dictionary<string, float> ProduceTags(byte[] imgData)
@@ -76,7 +75,7 @@ namespace CustomImageTagger
                 {
                     foreach(var result in listOfTags)
                     {
-                        if (!results.ContainsKey(result.name))
+                        if (!results.ContainsKey(result.name) && result.confidence > _threshold)
                         {
                             results.Add(result.name, result.confidence);
                         }
@@ -84,16 +83,6 @@ namespace CustomImageTagger
                 }
 
                 return results;
-
-                //IEnumerable<RecognizationResult> source = 
-                //    ((IEnumerable<List<RecognizationResult>>)recognizationResultListList).SelectMany<List<RecognizationResult>, RecognizationResult>((Func<List<RecognizationResult>, IEnumerable<RecognizationResult>>)
-                //    (r => (IEnumerable<RecognizationResult>)r)).Where<RecognizationResult>((Func<RecognizationResult, bool>)(r => (bool)r.bHighlyConfident))
-                //    .GroupBy<RecognizationResult, string>((Func<RecognizationResult, string>)(r => (string)r.name))
-                //    .Select<IGrouping<string, RecognizationResult>, RecognizationResult>((Func<IGrouping<string, RecognizationResult>, RecognizationResult>)(r => ((IEnumerable<RecognizationResult>)r).First<RecognizationResult>()));
-
-                //Func<RecognizationResult, string> func = (Func<RecognizationResult, string>)(r => (string)r.name);
-                //Func<RecognizationResult, string> keySelector = null;
-                //return source.ToDictionary<RecognizationResult, string, float>(keySelector, (Func<RecognizationResult, float>)(r => (float)r.confidence));
             }
         }
     }
