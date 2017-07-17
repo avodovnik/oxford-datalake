@@ -11,8 +11,8 @@ DECLARE @image_gps_long = 4;
 
 @imgs =
     EXTRACT FileName string, ImgData byte[]
-//    FROM @"/camera-roll/{FileName}.JPG"
-    FROM @"/camera-roll-subset/{FileName}.JPG"
+    FROM @"/camera-roll/{FileName}.JPG"
+//    FROM @"/camera-roll-subset/{FileName}.JPG"
     USING new Cognition.Vision.ImageExtractor();
 
   @metadata =
