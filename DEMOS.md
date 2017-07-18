@@ -22,9 +22,10 @@
 1. Open Visual Studio - and the SLN file from 02-ImageTagging
 1. Explain the USQL and what's going on
 1. Stop at `REFERENCE ASSEMBLY CustomImageTagger;`
-
+1. Open Portal again, this time open the ADLS pane, go into data explorer, then `usqlext/assembly/cognition`
 
 
 Notes:
 
 * show the DLLs and where they are in ADLA?
+
