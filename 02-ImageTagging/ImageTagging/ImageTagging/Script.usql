@@ -11,8 +11,8 @@ DECLARE @image_gps_long = 4;
 
 @imgs =
     EXTRACT FileName string, ImgData byte[]
-    FROM @"/camera-roll/{FileName}.JPG"
-//    FROM @"/camera-roll-subset/{FileName}.JPG"
+//    FROM @"/camera-roll/{FileName}.JPG"
+    FROM @"/camera-roll-subset/{FileName}.JPG"
     USING new Cognition.Vision.ImageExtractor();
 
   @metadata =
@@ -39,5 +39,5 @@ DECLARE @image_gps_long = 4;
             WHERE ImageTagging.Helper.HasTag("food", r.Tags);
 
 OUTPUT @combined
-TO "/output/combined.csv"
+TO "/output/combined-subset.csv"
 USING Outputters.Csv();
